@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+  app:
+    container_name: app
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: >
+      sh -c "./manage.py migrate &&
+             ./manage.py runserver 0.0.0.0:8000"
+
+    env_file:
+      - ./.env
+    links:
+      - db:db
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app_network
+
+
+  db:
+    container_name: postgres
+    image: postgres:14.1-alpine
+    env_file:
+      - ./.env
+    environment:
+      - "POSTGRES_HOST_AUTH_METHOD=trust"
+    volumes:
+      - pgdata:/var/lib/postgresql@14/data:rw
+    networks:
+      - app_network
+  redis:
+    image: redis:alpine
+    container_name : redis
+    restart: unless-stopped
+    ports:
+        - 6379:6379
+    networks:
+      - app_network
+
+  celery:
+    restart: always
+    build:
+      context: .
+    command: celery -A django_todo worker --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app_network
+
+volumes:
+  pgdata:
+
+networks:
+    app_network:
+        driver: bridge
