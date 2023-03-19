@@ -7,6 +7,6 @@
 3) __After starting the project, you can find the API documentation at the link:__
 `http://localhost:8000/api/schema/swagger-ui/`
 4) __For correct work of the app, you need to create .env file in the root folder and add keys and custom values as in the sample in .env.example__
-5) __To open a terminal in docker container, use the command ```docker exec -it app sh```
+5) __To open a terminal in docker container, use the command__ ```docker exec -it app sh```
 
 ## I wish you a good use of the application
